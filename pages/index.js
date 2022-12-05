@@ -3,15 +3,8 @@ import Image from "next/image";
 import buildspaceLogo from "../assets/buildspace-logo.png";
 import { useState } from "react";
 
-import { Configuration, OpenAIApi } from "openai";
 
 const Home = () => {
-  const configuration = new Configuration({
-    apiKey: "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",
-  });
-
-  const openai = new OpenAIApi(configuration);
-
   const [userInput, setUserInput] = useState("");
   const [apiOutput, setApiOutput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
