@@ -1,3 +1,4 @@
+import next from "next";
 import { Configuration, OpenAIApi } from "openai";
 
 export const configuration = new Configuration({
@@ -6,13 +7,12 @@ export const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const basePromptPrefix = "generate a prompt for dalle-2 painting with this description:";
+const basePromptPrefix =
+  "generate 3 prompts in an json array without the variable so it can  generate beautiful paintings using differnt techniquest with Dal-e 2. Usethe following prompt: ";
 
 const generateAction = async (req, res) => {
-  // Run first prompt
-  console.log(`API: ${basePromptPrefix}${req.body.userInput}`);
-
-
+  console.log(`API: ${req.body.userInput}`);
+  let defaultprompts = ["albanian art", "mexican art", "american art"];
 
   const baseCompletion = await openai.createCompletion({
     model: "text-davinci-003",
@@ -22,20 +22,35 @@ const generateAction = async (req, res) => {
   });
 
   const basePromptOutput = baseCompletion.data.choices.pop();
-console.log(basePromptOutput.text)
+  let generatedPrompts = basePromptOutput.text || "";
+  let promptsArr = await JSON.parse(generatedPrompts);
 
+  console.log("prompts", generatedPrompts);
 
-  const pic = await openai.createImage({
-    prompt: basePromptOutput.text,
-    n: 1,
-    size: "256x256",
-  });
-  const image = pic.data.data[0].url;
+  let generatedImages = [];
+  if (promptsArr) {
+    for (let i = 0; i < promptsArr.length; i++) {
+      const pic = await openai.createImage({
+        prompt: promptsArr[i] || defaultprompts,
+        n: 2,
+        size: "1024x1024",
+      });
+      generatedImages.push({image: pic.data.data[0].url, text: promptsArr[i] });
+      console.log("images", pic.data.data[0].url, promptsArr[i]);
 
-  res.status(200).json({ output: {image: image, text: basePromptOutput } });
+    }
+
+    // console.log("images", generatedImages);
+  }
+
+      if (generatedImages && basePromptOutput)
+      res.status(200)
+      .json({ output: { generatedImages } });
+            else {
+        res.status(500).json({ error: "Ha Ocurrido un error" });
+      }
+return
 
 };
-
-
 
 export default generateAction;

@@ -1,59 +1,117 @@
 import Head from "next/head";
 import Image from "next/image";
 import buildspaceLogo from "../assets/buildspace-logo.png";
-import { useState } from "react";
+import defaultImg from "../assets/default.png";
 
+import { useState, useEffect, useRef } from "react";
+import { useFullscreen, useToggle } from "react-use";
+import { ImEnlarge2, ImShrink2 } from "react-icons/im";
+
+const Slideshow = ({ images, autoplay, interval }) => {
+  // Add a ref to store the reference to the slideshow-container element
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const ref = useRef(null);
+  const [show, toggle] = useToggle(false);
+  const isFullscreen = useFullscreen(ref, show, {
+    onClose: () => toggle(false),
+  });
+
+  useEffect(() => {
+    if (!autoplay) {
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+     images&& setCurrentIndex((currentIndex + 1) % images.length);
+    }, interval);
+
+    return () => clearTimeout(timeout);
+  }, [currentIndex, autoplay, interval,images]);
+
+  // Listen for a click on the button
+  const previousSlide = () => {
+    setCurrentIndex((currentIndex + images.length - 1) % images.length);
+  };
+
+  const nextSlide = () => {
+    setCurrentIndex((currentIndex + 1) % images.length);
+  };
+
+  // Listen for a click on the button
+  if (images === undefined || images.length === 0 || !images) {
+    // initialize the images array with at least one element
+
+    images = null;
+  }
+
+  return (
+    <div className="slideshow-container" ref={ref}>
+      <div className="slideshow-image ">
+        {!images && <Image src={defaultImg} />}
+
+        {images && (
+          <div>
+            <img
+              src={images[currentIndex].image}
+              alt={images[currentIndex].alt}
+              className="ken-burns-image"
+            />
+            <div className="slideshow-image-overlay ">
+              <p>{images[currentIndex].text}</p>
+            </div>
+         
+          </div>
+          
+        )}
+          {images && (
+            <div> 
+           <button onClick={nextSlide}>Next</button>
+      <button onClick={previousSlide}>Prev</button>
+      </div>)}
+      </div>
+
+     
+
+      {isFullscreen ? (
+        <ImShrink2 className="fullscreen-button" onClick={() => toggle()} />
+      ) : (
+        <ImEnlarge2 className="fullscreen-button" onClick={() => toggle()} />
+      )}
+    </div>
+  );
+};
 
 const Home = () => {
   const [userInput, setUserInput] = useState("");
-  const [apiOutput, setApiOutput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [imageResult, setImageResult] = useState("");
+  const [apiOutput, setApiOutput] = useState([]);
+  const [imageResult, setImageResult] = useState([]);
 
   const promptGenerate = async () => {
     setIsGenerating(true);
     console.log("Calling OpenAI...");
+
     const response = await fetch("/api/generate", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
       body: JSON.stringify({ userInput }),
-    });
-
-    const data = await response.json();
-    const { output } = data;
-    console.log("OpenAI data...", data);
-
-    setApiOutput(`${output.text.text}`);
-
-    setImageResult(`${output.image}`);
-
-    setIsGenerating(false);
-  };
-
-  const imageGenerate = async () => {
-    setIsGenerating(true);
-
-    // const splits = apiOutput.split(/\s(?=\d+\.)/);
-    // const list = splits.map((el) => el.slice(3));
-
-    console.log("Calling OpenAI...");
-    const response = await fetch("/api/imageGenerate", {
-      method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ apiOutput }),
     });
 
     const data = await response.json();
     const { output } = data;
-    console.log("OpenAI replied...", output);
+    console.log("OpenAI data...", output);
 
-    setImageResult(`${output}`);
+    setApiOutput(`${output.text}`);
+
+    setImageResult(output.generatedImages);
+
     setIsGenerating(false);
   };
+
+  console.log(imageResult, "res");
 
   const onUserChangedText = (event) => {
     setUserInput(event.target.value);
@@ -74,6 +132,13 @@ const Home = () => {
           </div>
         </div>
       </div>
+
+      {imageResult ? (
+        <Slideshow images={imageResult} autoplay interval={10000} />
+      ) : (
+        <></>
+      )}
+
       <div className="prompt-container">
         <textarea
           placeholder="start typing here"
@@ -102,33 +167,10 @@ const Home = () => {
         </div>
       </div>
 
-
-   
-      {imageResult.length > 0 ? (
-        <img className="result-image" src={imageResult} alt="result" />
-      ) : (
-        <></>
-      )}
-         {apiOutput && (
-        <div>
-          <div className="output">
-            <div className="output-header-container">
-              <div className="output-header">
-                <h3>Result</h3>
-              </div>
-            </div>
-            <div className="output-content">
-              <p>{apiOutput}</p>
-            </div>
-          </div>{" "}
-        </div>
-      )}
-
-
       <div className="badge-container grow">
         <a href="" target="_blank" rel="noreferrer">
           <div className="badge">
-            <Image src={buildspaceLogo} alt="buildspace logo" />
+            <Image src={buildspaceLogo} alt="mystic River logo" />
             <p> by Mystic River Technologies</p>
           </div>
         </a>
