@@ -66,8 +66,9 @@ const Slideshow = ({ images, autoplay, interval }) => {
         )}
           {images && (
             <div> 
-           <button onClick={nextSlide}>Next</button>
       <button onClick={previousSlide}>Prev</button>
+      <button onClick={nextSlide}>Next</button>
+
       </div>)}
       </div>
 
@@ -134,7 +135,7 @@ const Home = () => {
       </div>
 
       {imageResult ? (
-        <Slideshow images={imageResult} autoplay interval={10000} />
+        <Slideshow images={imageResult} autoplay interval={5000} />
       ) : (
         <></>
       )}

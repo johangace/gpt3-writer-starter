@@ -39,8 +39,6 @@ const generateAction = async (req, res) => {
       console.log("images", pic.data.data[0].url, promptsArr[i]);
 
     }
-
-    // console.log("images", generatedImages);
   }
 
       if (generatedImages && basePromptOutput)

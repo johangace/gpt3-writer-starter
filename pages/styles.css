@@ -27,7 +27,7 @@ body {
   flex-flow: column nowrap;
   gap: 10px;
   height: fit-content;
-  max-width: 1000px;
+  min-width: 500px;
   overflow: auto;
   padding: 30px;
   position: relative;
@@ -490,8 +490,8 @@ textarea {
 
 .slideshow-container {
   position: relative;
-  width: 1000px;
-  height: 1000px;
+  min-width: 512px;
+  min-height: 512px;
   margin: auto;
   overflow: auto;
 }
@@ -514,7 +514,7 @@ textarea {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 110%;
+  width: 100%;
   height: auto;
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
@@ -560,34 +560,21 @@ button:focus {
 }
 
 .ken-burns-image {
-  animation: ken-burns 10s infinite, fade-in 2s;
+  animation: ken-burns 4s infinite, fade-in 1s;
 }
 
 @keyframes ken-burns {
   0% {
     transform: scale(1) translateX(0%) translateY(0%);
-    opacity: 0;
-  }
-  80% {
-    transform: scale(1.22) translateX(0%) translateY(0%);
-    opacity: 1;
+  
   }
   100% {
-    transform: scale(1.22) translateX(0%) translateY(0%);
-
-    opacity: 0;
-  }
-
-}
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
+    transform: scale(1.1) translateX(0%) translateY(0%);
   }
 }
+
+
+
 
 
 
